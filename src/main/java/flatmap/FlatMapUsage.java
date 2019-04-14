@@ -3,6 +3,7 @@ package flatmap;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class FlatMapUsage {
     public static void main(String[] args) {
@@ -19,6 +20,9 @@ public class FlatMapUsage {
         List<Integer> number2=Arrays.asList(4,5);
 
         List<int[] > pairs=number1.stream().flatMap(i-> number2.stream().map(j-> new int[]{i,j})).collect(Collectors.toList());
+
+        //pairs.stream().forEach(x-> System.out.println(x[0]+","+x[1]));
+
 
     }
 }

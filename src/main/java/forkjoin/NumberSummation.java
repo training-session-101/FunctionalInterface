@@ -7,18 +7,23 @@ import java.util.stream.LongStream;
 
 public class NumberSummation {
     public static void main(String[] args) {
-        long n = 10_00000;
+        long n = 1000;
         long[] data = LongStream.rangeClosed(0, n).toArray();
         ForkJoinPool forkJoinPool = new ForkJoinPool();
-        ForkJoinTask<Long> task = new Summation(data, 0, data.length - 1);
+        ForkJoinTask<Long> task = new Summation(data);
         System.out.println(forkJoinPool.invoke(task));
     }
 
 }    class Summation extends RecursiveTask<Long>{
+
+    public Summation(long[] numbers) {
+        this(numbers,0,numbers.length);
+    }
+
         private long[]  data;
         private long startIndex;
         private long endIndex;
-        private final long MAXSIZE=10_000;
+        private final long MAXSIZE=100;
 
         public Summation(long[] data, long startIndex, long endIndex) {
             this.data = data;
@@ -26,23 +31,18 @@ public class NumberSummation {
             this.endIndex = endIndex;
         }
 
-        @Override
+
+    @Override
         protected Long compute() {
             if(this.data.length <= MAXSIZE){
                 return sum();
             }
             else{
-                startIndex=0;
-                endIndex=startIndex+data.length/2;
-                Summation leftSummation=new Summation(data,startIndex,endIndex);
+                Summation leftSummation=new Summation(data,startIndex,startIndex+endIndex/2);
                 leftSummation.fork();
-
-                Summation rightSummation=new Summation(data,endIndex+1,data.length-1);
+                Summation rightSummation=new Summation(data,startIndex+(endIndex/2),endIndex);
                 long rightResult=rightSummation.compute();
-
                 long leftResult=leftSummation.join();
-
-                //System.out.println("The Final Summation Value is --- "+leftResult+rightResult);
                 return leftResult+rightResult;
             }
         }
